@@ -1,4 +1,4 @@
-from albumentations import Illumination, Compose
+from albumentations import Illumination, Compose, RandomBrightnessContrast
 from random import random, sample
 from PIL.Image import open as image_opener
 from numpy import array
@@ -25,20 +25,26 @@ for folder in os.listdir(src):
     for name in names:
         image = array(image_opener(f'{src}/{folder}/{name}'))
         plt.imsave(
-            f'{"val" if random() < val_threshold else "train"}/{folder}/ori_{name}',
+            f'{"val" if random() < val_threshold else "train"}/{folder}/0_{name}',
             image
         )
-        for mode in ["brighten", "darken"]:
+        for i in range(5):
             plt.imsave(
-                f'{"val" if random()<val_threshold else "train"}/{folder}/{mode[:3]}_{name}',
+                f'{"val" if random()<val_threshold else "train"}/{folder}/{i+1}_{name}',
                 Compose([
+                    RandomBrightnessContrast(
+                        brightness_limit=[-0.1, -0.5],
+                        contrast_limit=[0, 0],
+                        brightness_by_max=False,
+                        ensure_safe_range=False
+                    ),
                     Illumination(
-                        mode="linear",
-                        intensity_range=[0.01, 0.2],
-                        effect_type=mode,
+                        mode="gaussian",
+                        intensity_range=[0.1, 0.2],
+                        effect_type="darken",
                         angle_range=[0, 360],
                         center_range=[0.1, 0.9],
                         sigma_range=[0.2, 1]
-                    )
+                    ),
                 ])(image = image)['image']
             )
