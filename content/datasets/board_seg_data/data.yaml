@@ -1,6 +1,7 @@
 path: board_seg_data
 train: images/train
 val: images/val
+test: images/test
 
 names:
   0: Board
