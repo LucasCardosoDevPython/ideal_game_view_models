@@ -1,4 +1,4 @@
-path: board_seg_data
+path: D:/FastAPIProject/ideal_dataset/content/datasets/board_seg_data
 train: images/train
 val: images/val
 test: images/test

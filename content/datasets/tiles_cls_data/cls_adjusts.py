@@ -28,12 +28,12 @@ for folder in os.listdir(src):
             f'{"val" if random() < val_threshold else "train"}/{folder}/0_{name}',
             image
         )
-        for i in range(5):
+        for i in range(9):
             plt.imsave(
                 f'{"val" if random()<val_threshold else "train"}/{folder}/{i+1}_{name}',
                 Compose([
                     RandomBrightnessContrast(
-                        brightness_limit=[-0.1, -0.5],
+                        brightness_limit=i*-0.05-0.1,
                         contrast_limit=[0, 0],
                         brightness_by_max=False,
                         ensure_safe_range=False

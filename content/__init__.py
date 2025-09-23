@@ -1,1 +1,1 @@
-ROOT = 'C:\\Users\\lucas\\OneDrive\\Área de Trabalho\\ideal_dataset\\content'
+ROOT = 'D:\\FastAPIProject\\ideal_dataset\\content'
