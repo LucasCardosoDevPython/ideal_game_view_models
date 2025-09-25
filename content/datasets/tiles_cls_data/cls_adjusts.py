@@ -1,9 +1,14 @@
-from albumentations import Illumination, Compose, RandomBrightnessContrast
-from random import random, sample
-from PIL.Image import open as image_opener
-from numpy import array
-import matplotlib.pyplot as plt
 import os
+
+from skimage.filters import difference_of_gaussians
+
+from PIL import Image
+
+from numpy import array
+
+import matplotlib.pyplot as plt
+
+from random import random, sample
 
 
 #clear
@@ -12,39 +17,29 @@ for src in ['train', 'val']:
         for name in os.listdir(f'{src}/{folder}'):
             os.remove(f'{src}/{folder}/{name}')
 
-#poppulate
-data_size = 150
-val_threshold = 0.15
-src = 'full'
 
-for folder in os.listdir(src):
+folders = os.listdir('full')
+DIFFERENCE_OF_GAUSSIANS_LOW_SIGMA = 1
+DATASET_SAMPLE_SIZE = 150
+VALIDATION_TRESHOLD = 0.15
+
+for folder in folders:
     if folder == 'BAD':
-        names = sample(os.listdir(f'{src}/{folder}'), data_size*3)
+        names = sample(os.listdir(os.path.join('full', folder)), DATASET_SAMPLE_SIZE * 2)
+        valNames = sample(names, int(DATASET_SAMPLE_SIZE * 2 * VALIDATION_TRESHOLD))
     else:
-        names = sample(os.listdir(f'{src}/{folder}'), data_size)
+        names = sample(os.listdir(os.path.join('full', folder)), DATASET_SAMPLE_SIZE)
+        valNames = sample(names, int(DATASET_SAMPLE_SIZE * VALIDATION_TRESHOLD))
     for name in names:
-        image = array(image_opener(f'{src}/{folder}/{name}'))
+        saveDirectory = os.path.join('val' if name in valNames else 'train', folder)
+        if not os.path.exists(saveDirectory):
+            os.makedirs(saveDirectory)
+
         plt.imsave(
-            f'{"val" if random() < val_threshold else "train"}/{folder}/0_{name}',
-            image
+            os.path.join(saveDirectory, name),
+            difference_of_gaussians(
+                array(Image.open(os.path.join('full', folder, name)).convert('L')) / 255,
+                DIFFERENCE_OF_GAUSSIANS_LOW_SIGMA
+            ),
+            cmap='gray'
         )
-        for i in range(9):
-            plt.imsave(
-                f'{"val" if random()<val_threshold else "train"}/{folder}/{i+1}_{name}',
-                Compose([
-                    RandomBrightnessContrast(
-                        brightness_limit=i*-0.05-0.1,
-                        contrast_limit=[0, 0],
-                        brightness_by_max=False,
-                        ensure_safe_range=False
-                    ),
-                    Illumination(
-                        mode="gaussian",
-                        intensity_range=[0.1, 0.2],
-                        effect_type="darken",
-                        angle_range=[0, 360],
-                        center_range=[0.1, 0.9],
-                        sigma_range=[0.2, 1]
-                    ),
-                ])(image = image)['image']
-            )

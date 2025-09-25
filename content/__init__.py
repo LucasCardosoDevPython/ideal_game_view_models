@@ -1,1 +1,1 @@
-ROOT = 'D:\\FastAPIProject\\ideal_dataset\\content'
+ROOT = 'D:\\FastAPIProject\\remote\\ideal_game_view_models\\content'
